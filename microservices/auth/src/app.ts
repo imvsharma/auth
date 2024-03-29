@@ -1,11 +1,17 @@
 import express, {Express, Router, Request, Response} from 'express';
+import kafkaAdminInit from './utils/kafka/admin';
 
 class App {
     public express!:Express;
 
     constructor() {
         this.express = express();
+        this.mountKafkaAdmin()
         this.mountRoute()
+    }
+
+    private mountKafkaAdmin(): void {
+        kafkaAdminInit()
     }
 
     private mountRoute(): void {

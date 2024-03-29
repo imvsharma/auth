@@ -2,7 +2,8 @@ import {Router, Response, Request, NextFunction} from 'express'
 import { CreateUserDTO, UpdateUserDTO } from '../dto/user.dto';
 import UserController from '../controller/user';
 import createUserSchema from '../api/schema/user.schema';
-import { send } from 'process';
+import passwordEncryption from '../utils/bcrypt';
+
 
 class UserRoutes {
     public router!: Router;
@@ -30,7 +31,8 @@ class UserRoutes {
             if (error) {
                 return res.status(400).send({success: false, error: error.details[0].message})
             }
-            const payload:CreateUserDTO = req.body;
+            const hashedPassword = await passwordEncryption.hashedPassword(req.body.password)
+            const payload:CreateUserDTO = Object.assign(req.body, {'password': hashedPassword});
             console.log("payload", payload);
             
             const result = await controller.create(payload);

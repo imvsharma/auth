@@ -1,13 +1,14 @@
-FROM node:lts-alpine
-
-WORKDIR /app
-
-COPY package*.json ./
-
-RUN npm install
-
+FROM node:lts-alpine3.19
+ 
+WORKDIR /usr/src/app
+ 
+COPY package.json ./package.json
+COPY package-lock.json ./package-lock.json
+RUN npm ci
+ 
 COPY . .
-
+ 
 EXPOSE 3000
-
-CMD ["npm","run", "dev"]
+ 
+CMD [ "npm", "run", "dev" ]
+ 
