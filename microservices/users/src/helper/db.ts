@@ -15,7 +15,10 @@ class UserConnection {
             password: config.PASSWORD,
             host: config.HOST,
             dialect: dailect,
-            pool: config.pool
+            pool: config.pool,
+            query: {
+                raw: true
+            }
         })
 
         try{

@@ -1,29 +1,40 @@
 import express, {Express, Router, Request, Response} from 'express';
-import kafkaAdminInit from './utils/kafka/admin';
+
+import AuthRoutes from './routes/auth.routes';
+import passport from 'passport';
+import bodyParser from 'body-parser';
+import cors from 'cors';
+import helmet from 'helmet';
+import { setupPassport } from './strategies/auth';
 
 class App {
     public express!:Express;
+    authRoutes = new AuthRoutes();
 
     constructor() {
         this.express = express();
-        this.mountKafkaAdmin()
-        this.mountRoute()
+        this.initializeMiddlewares(this.express)
+        this.initializeRouters(this.express)
     }
 
-    private mountKafkaAdmin(): void {
-        kafkaAdminInit()
+    private initializeRouters (app:Express) {
+        app.use('/api/auth-ms/', this.authRoutes.router)
     }
 
-    private mountRoute(): void {
-        const router = Router();
-        router.get('/', (req: Request, res: Response) => {
-            res.json({
-                message: "Hello NodeJS hotttttt"
-            })
-        })
-
-        this.express.use(router)
+    private setUpPassport () {
+        setupPassport(passport)
     }
+
+    private initializeMiddlewares (app:Express) {
+        app.use(helmet())
+        app.use(cors());
+        app.use(bodyParser.json());
+        app.use(bodyParser.urlencoded({extended:true}))
+        app.use(passport.initialize())
+        this.setUpPassport()
+    }
+
+    
     
 }
 

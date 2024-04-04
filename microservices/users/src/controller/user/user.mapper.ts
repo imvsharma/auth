@@ -1,4 +1,4 @@
-import { IUser, UserOutput } from './../../interface/user.interface';
+import { IUser, IUserNotFound, UserNotFoundOutput, UserOutput } from './../../interface/user.interface';
 
 const toUser = (user:UserOutput): IUser => {
     const {id, username, email, password, createdAt, updatedAt, deletedAt} = user

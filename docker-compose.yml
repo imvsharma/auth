@@ -88,36 +88,37 @@ services:
   #   depends_on:
   #     - kong-bootstrap
 
-  kafka:
-    container_name: kafka
-    image: apache/kafka:latest
-    hostname: kafka
-    ports:
-      - ${KAFKA_PORT}:${KAFKA_PORT}
-    environment:
-      KAFKA_NODE_ID: 1
-      KAFKA_PROCESS_ROLES: 'broker,controller'
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT'
-      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka:9093'
-      KAFKA_LISTENERS: 'PLAINTEXT://:19092,CONTROLLER://:9093,PLAINTEXT_HOST://:9092'
-      KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:19092,PLAINTEXT_HOST://kafka:9092
-      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
-      CLUSTER_ID: '4L6g3nShT-eMCtK--X86sw'
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-      KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
+  # kafka:
+  #   container_name: kafka
+  #   image: apache/kafka:latest
+  #   hostname: kafka
+  #   ports:
+  #     - ${KAFKA_PORT}:${KAFKA_PORT}
+  #   environment:
+  #     KAFKA_NODE_ID: 1
+  #     KAFKA_PROCESS_ROLES: 'broker,controller'
+  #     KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT'
+  #     KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka:9093'
+  #     KAFKA_LISTENERS: 'PLAINTEXT://:19092,CONTROLLER://:9093,PLAINTEXT_HOST://:9092'
+  #     KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
+  #     KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:19092,PLAINTEXT_HOST://kafka:9092
+  #     KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+  #     CLUSTER_ID: '4L6g3nShT-eMCtK--X86sw'
+  #     KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+  #     KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+  #     KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+  #     KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+  #     KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
+  #     KAFKAJS_NO_PARTITIONER_WARNING: 1
 
-  kafka-ui:
-    container_name: kafka-ui
-    image: 'provectuslabs/kafka-ui:latest'
-    ports:
-      - "8080:8080"
-    environment:
-      - KAFKA_CLUSTERS_0_BOOTSTRAP_SERVERS=kafka:9092
-      - KAFKA_CLUSTERS_0_NAME=4L6g3nShT-eMCtK--X86sw
+  # kafka-ui:
+  #   container_name: kafka-ui
+  #   image: 'provectuslabs/kafka-ui:latest'
+  #   ports:
+  #     - "8080:8080"
+  #   environment:
+  #     - KAFKA_CLUSTERS_0_BOOTSTRAP_SERVERS=kafka:9092
+  #     - KAFKA_CLUSTERS_0_NAME=4L6g3nShT-eMCtK--X86sw
   # client:
   #   container_name: auth-client
   
@@ -134,7 +135,7 @@ services:
       - DB_PASSWORD=${USER_DB_PASSWORD}
       - DB_USER=${USER_DB_USERNAME}
       - DB=${USER_DB_NAME}
-      - KAFKA_URL=kafka:${KAFKA_PORT}
+      - MESSAGE_BROKER_URL=${RABBIT_MQ_URL}
     volumes:
       - ./microservices/users/:/app
     depends_on:
@@ -145,7 +146,7 @@ services:
     container_name: auth-ms
     environment:
       - AUTH_PORT=${AUTH_PORT}
-      - KAFKA_URL=kafka:${KAFKA_PORT}
+      - MESSAGE_BROKER_URL=${RABBIT_MQ_URL}
     build:
       context: ./microservices/auth
       dockerfile: Dockerfile
@@ -153,8 +154,7 @@ services:
       - ${AUTH_PORT}:${AUTH_PORT}
     volumes:
       - ./microservices/auth/:/usr/src/app
-    depends_on:
-      - kafka
+    
 volumes:
   kongdata:
   usersdata:
